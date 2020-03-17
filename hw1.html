@@ -70,7 +70,13 @@ function init() {
   geometry.computeFaceNormals();
   geometry.computeVertexNormals();
   car = new THREE.Mesh(geometry,new THREE.MeshNormalMaterial());
- 	scene.add(car);
+  scene.add(car);
+  
+  var geometry = new THREE.CylinderGeometry( 5,5, 20, 32 );
+  var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+  var cylinder = new THREE.Mesh( geometry, material );
+  cylinder.position.set(0,10,0);
+  scene.add( cylinder );
   
   theta = 0;
 }
