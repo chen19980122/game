@@ -1,0 +1,321 @@
+<html>
+<style>
+#info {
+  position: absolute;
+  top: 2%;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00;
+}
+
+body {
+  overflow: hidden;
+}
+
+</style>
+<head>
+
+</head>
+<body>
+
+<div id="info">
+  <button id="play" style="width:20%">Play Music</button>
+</div>
+
+<audio id="soundtrack" autoplay loop style="display:none">
+	<source src="丸子與銀河龍 konore 飢餓と宝玉 op.mp3" type='audio/mp3'>
+</audio>
+
+<audio id="collision" style="display:none">
+	<source src="collision_wall.wav" type='audio/wav'>
+</audio>
+
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+</script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+function collision_wall(){
+  var audio = document.createElement("audio");
+  audio.src = "collision_wall.wav";
+  audio.volume = 0.2;
+  audio.play();
+}
+
+
+var camera, scene, renderer;
+var puck;
+var pos, vel, force;
+var walls = [];
+var pucks = [];
+var pucklight;
+var isPaused = false;
+
+class Puck{
+	constructor(pucklight,mesh,force,vel,pos){
+  	this.pucklight = pucklight;
+    this.mesh = mesh;
+    this.force = force;
+    this.vel = vel;
+    this.pos = pos;
+    scene.add(this.pucklight);
+    scene.add(this.mesh);
+  }
+
+}
+
+init();
+animate();
+
+$("#play").click(function() {
+  isPaused = !isPaused;
+	if (isPaused) { 
+		$('#play').text ('Play Music');
+		soundtrack.pause();
+	} else {
+		$('#play').text ('Pause Music');
+		soundtrack.play();
+	}
+});
+
+function init() {
+
+  scene = new THREE.Scene();
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+  camera.position.z = 500;
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+	var light = new THREE.AmbientLight( 0xFFFFFF, 0.5); // soft white light
+	scene.add( light );
+  
+  var light2 = new THREE.PointLight( 0xffffff, 1, 500 );
+	scene.add( light2 );
+
+////////////////////////////////////////////////////////////////
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  //scene.add(gridXZ);
+  
+  var floor = new THREE.Mesh (new THREE.PlaneGeometry(200,200), new THREE.MeshPhongMaterial());
+  scene.add (floor);
+  floor.rotation.x = -Math.PI/2; 
+  
+  /// boundary
+  wall = new THREE.Mesh (new THREE.BoxGeometry (10, 20,200), new THREE.MeshPhongMaterial());
+  scene.add (wall);
+
+  wall.position.set (105, 10, 0);
+  
+  wall.point = new THREE.Vector3(100,0,0);
+  wall.normal = new THREE.Vector3(-1,0,0);
+  walls.push (wall);
+  
+  wall = new THREE.Mesh (new THREE.BoxGeometry (10, 20,200), new THREE.MeshPhongMaterial());
+  scene.add (wall);
+  wall.position.set (-105, 10, 0);
+  
+  wall.point = new THREE.Vector3(-100,0,0);
+  wall.normal = new THREE.Vector3(1,0,0);
+  walls.push (wall);
+  
+  wall = new THREE.Mesh (new THREE.BoxGeometry (200, 20,10), new THREE.MeshPhongMaterial());
+  scene.add (wall);
+
+	wall.position.set (0, 10, 105);
+  
+  wall.point = new THREE.Vector3(0,0,100);
+  wall.normal = new THREE.Vector3(0,0,-1);
+  walls.push (wall);
+  
+  wall = new THREE.Mesh (new THREE.BoxGeometry (200, 20,10), new THREE.MeshPhongMaterial());
+  scene.add (wall);
+  
+  wall.position.set (0, 10, -105);
+  
+  wall.point = new THREE.Vector3(0,0,-100);
+  wall.normal = new THREE.Vector3(0,0,1);
+  walls.push (wall);
+  
+  
+  //////////////////
+  let p;
+  
+  //1
+  //PointLight
+  pucklight = new THREE.PointLight( 'red', 1,100);
+  
+  //mesh
+  mesh = new THREE.Mesh (new THREE.CylinderGeometry (10,10,4,20), new THREE.MeshBasicMaterial({color:'red'}));
+
+  mesh.position.y = 2;
+  
+  //force,vel,pos
+  force = new THREE.Vector3(0,0,0);
+  vel = new THREE.Vector3(10, 0, 10);
+  pos = new THREE.Vector3(10,0,-50);
+  
+  //push
+  p = new Puck(pucklight,mesh,force,vel,pos);
+  pucks.push(p);
+  
+  
+  //2
+  //PointLight
+  pucklight = new THREE.PointLight( 0x5cf2f2, 1,100);
+ 	
+  //mesh
+  mesh = new THREE.Mesh (new THREE.CylinderGeometry (10,10,4,20), new THREE.MeshBasicMaterial({color:0x5cf2f2}));
+  mesh.position.y = 2;
+  
+  //force,vel,pos
+  force = new THREE.Vector3(0,0,0);
+  vel = new THREE.Vector3(10, 0, -10);
+  pos = new THREE.Vector3(45,0,0);
+  
+  //push
+  p = new Puck(pucklight,mesh,force,vel,pos);
+  pucks.push(p);
+  
+  
+  //3
+  //PointLight
+  pucklight = new THREE.PointLight( 'yellow', 1,100);
+  
+  //mesh
+  mesh = new THREE.Mesh (new THREE.CylinderGeometry (10,10,4,20), new THREE.MeshBasicMaterial({color:0xfcba03}));
+  mesh.position.y = 2;
+  
+  //force,vel,pos
+  force = new THREE.Vector3(0,0,0);
+  vel = new THREE.Vector3(-10, 0, 10);
+  pos = new THREE.Vector3(-10,0,25);
+  
+  //push
+  p = new Puck(pucklight,mesh,force,vel,pos);
+  pucks.push(p);
+  
+  //4
+  //PointLight
+  pucklight = new THREE.PointLight( 'green' , 1,100);
+  
+  //mesh
+  mesh = new THREE.Mesh (new THREE.CylinderGeometry (10,10,4,20), new THREE.MeshBasicMaterial({color:'green'}));
+  mesh.position.y = 2;
+  
+  //force,vel,pos
+  force = new THREE.Vector3(0,0,0);
+  vel = new THREE.Vector3(10, 0, -10);
+  pos = new THREE.Vector3(25,0,25);
+  
+  //push
+  p = new Puck(pucklight,mesh,force,vel,pos);
+  pucks.push(p);
+  
+  //5
+  //PointLight
+  pucklight = new THREE.PointLight( 0xA020F0, 1,100);
+  
+  //mesh
+  mesh = new THREE.Mesh (new THREE.CylinderGeometry (10,10,4,20), new THREE.MeshBasicMaterial({color:0xA020F0}));
+  mesh.position.y = 2;
+  
+  //force,vel,pos
+  force = new THREE.Vector3(0,0,0);
+  vel = new THREE.Vector3(10, 0, 10);
+  pos = new THREE.Vector3(-50,0,-25);
+  
+  //push
+  p = new Puck(pucklight,mesh,force,vel,pos);
+  pucks.push(p);
+  
+}
+
+function collision_detection(vel,pos,vel1,pos1){
+  let dis = pos.clone().distanceTo(pos1.clone());
+  if(dis<=20)
+  {
+	collision_wall();
+  	let v1v2 = vel.clone().sub(vel1.clone());				//第一球減第二球(速度)
+	let v2v1 = vel1.clone().sub(vel.clone());				//第二球減第一球(速度)
+	let x1x2 = pos.clone().sub(pos1.clone());				//第一球減第二球(位置)
+	let x2x1 = pos1.clone().sub(pos.clone());				//第二球減第一球(位置)
+    
+    let vn = vel.clone().sub(x1x2.clone().multiplyScalar((2 * 1) / (1 + 1) * v1v2.clone().dot(x1x2) / (x1x2.length() * x1x2.length())));//1=pucks's mass 
+    let vn1 = vel1.clone().sub(x2x1.clone().multiplyScalar((2 * 1) / (1 + 1) * v2v1.clone().dot(x2x1) / (x2x1.length() * x2x1.length())));
+    vel.copy(vn);
+    vel1.copy(vn1);
+    
+    let delta = pos1.clone().sub( pos );
+    let diff = ( delta.length() - ( 10  + 10 ) ) / delta.length();//15=pucks's radius
+    pos.add( delta.clone().multiplyScalar( 0.5 * diff) );
+    pos1.add( delta.clone().multiplyScalar( 0.5 * diff) );
+    
+  }
+
+}
+
+
+function animate() {
+  var dt = 0.1;
+  var dt1 = 0.1;
+  var dt2 = 0.1;
+  var eps = 1e-3; // 0.001
+  var cR = 1.0;
+  
+  
+  // Euler's method
+  for(i=0;i < pucks.length;i++){
+  	let puck = pucks[i];
+    puck.vel.add (puck.force.clone().multiplyScalar(dt));
+    puck.pos.add (puck.vel.clone().multiplyScalar(dt));
+    puck.mesh.position.copy (puck.pos);
+    puck.mesh.position.y += 2;
+    puck.pucklight.position.copy (puck.mesh.position);
+    puck.pucklight.position.y += 10;
+  }
+  
+  //wall collision detection
+  for (i = 0; i < walls.length; i++) 
+  {
+    let wall = walls[i];
+    for(j = 0 ; j < pucks.length; j++){
+    	let puck = pucks[j];
+      if (puck.pos.clone().sub (wall.point).dot (wall.normal) < eps + 10) 
+      {
+		collision_wall();
+        var vN = wall.normal.clone().multiplyScalar(puck.vel.dot (wall.normal));
+        var vT = puck.vel.clone().sub(vN);
+        puck.vel.copy (vT.add (vN.multiplyScalar(-cR) ));
+      }
+    }
+  }
+  
+  //puck collision detection
+  for(i = 0;i < pucks.length; i++){
+  	let puck1 = pucks[i];
+  	for(j = i+1;j < pucks.length; j++){
+    	let puck2 = pucks[j];
+      collision_detection(puck1.vel,puck1.pos,puck2.vel,puck2.pos);
+    }
+  }
+  
+  requestAnimationFrame(animate);
+  render();
+
+}
+
+function render() {
+
+  renderer.render(scene, camera);
+
+}
+
+</script>
+</body>
+</html>
