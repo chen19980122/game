@@ -286,7 +286,7 @@ function animate() {
     let wall = walls[i];
     for(j = 0 ; j < pucks.length; j++){
     	let puck = pucks[j];
-      if (puck.pos.clone().sub (wall.point).dot (wall.normal) < eps + 11) 
+      if (puck.pos.clone().sub (wall.point).dot (wall.normal) < eps + 12) 
       {
 		collision_wall();
         var vN = wall.normal.clone().multiplyScalar(puck.vel.dot (wall.normal));
