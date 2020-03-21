@@ -252,7 +252,7 @@ function collision_detection(vel,pos,vel1,pos1){
     vel1.copy(vn1);
     
     let delta = pos1.clone().sub( pos );
-    let diff = ( delta.length() - ( 10  + 10 ) ) / delta.length();//10=pucks's radius
+    let diff = ( delta.length() - ( 10  + 10 + 1 ) ) / delta.length();//10=pucks's radius
     pos.add( delta.clone().multiplyScalar( 0.5 * diff) );
     pos1.add( delta.clone().multiplyScalar( 0.5 * diff) );
     
