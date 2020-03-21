@@ -238,7 +238,7 @@ function init() {
 
 function collision_detection(vel,pos,vel1,pos1){
   let dis = pos.clone().distanceTo(pos1.clone());
-  if(dis<=20)
+  if(dis<=21)
   {
 	collision_wall();
   	let v1v2 = vel.clone().sub(vel1.clone());				//第一球減第二球(速度)
@@ -252,7 +252,7 @@ function collision_detection(vel,pos,vel1,pos1){
     vel1.copy(vn1);
     
     let delta = pos1.clone().sub( pos );
-    let diff = ( delta.length() - ( 10  + 10 ) ) / delta.length();//15=pucks's radius
+    let diff = ( delta.length() - ( 10  + 10 ) ) / delta.length();//10=pucks's radius
     pos.add( delta.clone().multiplyScalar( 0.5 * diff) );
     pos1.add( delta.clone().multiplyScalar( 0.5 * diff) );
     
@@ -286,7 +286,7 @@ function animate() {
     let wall = walls[i];
     for(j = 0 ; j < pucks.length; j++){
     	let puck = pucks[j];
-      if (puck.pos.clone().sub (wall.point).dot (wall.normal) < eps + 10) 
+      if (puck.pos.clone().sub (wall.point).dot (wall.normal) < eps + 11) 
       {
 		collision_wall();
         var vN = wall.normal.clone().multiplyScalar(puck.vel.dot (wall.normal));
