@@ -92,11 +92,11 @@ function init() {
   camera.position.z = 500;
   let controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-	var light = new THREE.AmbientLight( 0xFFFFFF, 0.5); // soft white light
-	scene.add( light );
+  var light = new THREE.AmbientLight( 0x202020, 0.5); // soft white light
+  scene.add( light );
   
   var light2 = new THREE.PointLight( 0xffffff, 1, 500 );
-	scene.add( light2 );
+  scene.add( light2 );
 
 ////////////////////////////////////////////////////////////////
   var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
@@ -127,7 +127,7 @@ function init() {
   wall = new THREE.Mesh (new THREE.BoxGeometry (200, 20,10), new THREE.MeshPhongMaterial());
   scene.add (wall);
 
-	wall.position.set (0, 10, 105);
+  wall.position.set (0, 10, 105);
   
   wall.point = new THREE.Vector3(0,0,100);
   wall.normal = new THREE.Vector3(0,0,-1);
