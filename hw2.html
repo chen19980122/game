@@ -65,6 +65,19 @@ class Puck{
 
 }
 
+class Wall{
+	constructor(point,normal){
+  	this.pucklight = pucklight;
+    this.mesh = mesh;
+    this.force = force;
+    this.vel = vel;
+    this.pos = pos;
+    scene.add(this.pucklight);
+    scene.add(this.mesh);
+  }
+
+}
+
 init();
 animate();
 
@@ -114,6 +127,7 @@ function init() {
   
   wall.point = new THREE.Vector3(100,0,0);
   wall.normal = new THREE.Vector3(-1,0,0);
+  var w = new Wall(point,normal);
   walls.push (wall);
   
   wall = new THREE.Mesh (new THREE.BoxGeometry (10, 20,200), new THREE.MeshPhongMaterial());
@@ -122,6 +136,7 @@ function init() {
   
   wall.point = new THREE.Vector3(-100,0,0);
   wall.normal = new THREE.Vector3(1,0,0);
+  w = new Wall(point,normal);
   walls.push (wall);
   
   wall = new THREE.Mesh (new THREE.BoxGeometry (200, 20,10), new THREE.MeshPhongMaterial());
@@ -131,6 +146,7 @@ function init() {
   
   wall.point = new THREE.Vector3(0,0,100);
   wall.normal = new THREE.Vector3(0,0,-1);
+  w = new Wall(point,normal);
   walls.push (wall);
   
   wall = new THREE.Mesh (new THREE.BoxGeometry (200, 20,10), new THREE.MeshPhongMaterial());
@@ -140,6 +156,7 @@ function init() {
   
   wall.point = new THREE.Vector3(0,0,-100);
   wall.normal = new THREE.Vector3(0,0,1);
+  w = new Wall(point,normal);
   walls.push (wall);
   
   
