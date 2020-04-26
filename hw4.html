@@ -15,15 +15,21 @@
 </style>
 </header>
 <body>
-  <audio id="collisionsound" style="display:none">
+  <audio id="collision" style="display:none">
 	<source src="collision_wall.wav" type='audio/wav'>
-	</audio>
+</audio>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js"></script>
 	<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 	<script src="https://jyunming-chen.github.io/game3js/js/ccdsys.js"></script>
   <div id="info">
   </div>
   <script type="text/javascript">
+function collision_wall(){
+  var audio = document.createElement("audio");
+  audio.src = "collision_wall.wav";
+  audio.volume = 0.2;
+  audio.play();
+}
   	var scene, renderer, camera;
 
 	var puck,puck1;
@@ -275,8 +281,7 @@
 	  /////////////////////////////
 	  var distance = puck1.pos.clone().sub(endNow).length();
 	  if(distance < 20){
-	    audio = document.getElementById("collisionsound");
-	    audio.play();
+	    collision_wall();
 	    var offset = ((20 - distance)/2)/distance;
 	    var Voffset1 = puck1.pos.clone().sub(endNow.clone()).multiplyScalar(offset);
 	    var v = puck1.vel.clone().sub(puck1.pos.clone().sub(endNow).multiplyScalar(puck1.vel.clone().sub(vel).dot(puck1.pos.clone().sub(endNow))/Math.pow(puck1.pos.clone().sub(endNow).length(),2)));
@@ -288,8 +293,7 @@
 	  /////////////////////////////////
 	  var distance1 = puck1.pos.clone().sub(endNow1).length();
 	  if(distance1 < 20){
-	    audio = document.getElementById("collisionsound");
-	    audio.play();
+	    collision_wall();
 	    var offset1 = ((20 - distance1)/2)/distance1;
 	    var Voffset2 = puck1.pos.clone().sub(endNow1.clone()).multiplyScalar(offset1);
 	    var v = puck1.vel.clone().multiplyScalar(-1);
@@ -300,8 +304,7 @@
 	  for(i = 0;i < walls.length;i++){
 	    let wall1 = walls[i];
 	    if(puck1.pos.clone().sub(wall1.getPoint).dot(wall1.getNormal) < eps + 10){
-	      audio = document.getElementById("collisionsound");
-	      audio.play();
+		  collision_wall();
 	      var vN = wall1.getNormal.clone().multiplyScalar(puck1.vel.dot(wall1.getNormal));
 	      var vT = puck1.vel.clone().sub(vN);
 	      puck1.vel.copy(vT.add(vN.multiplyScalar(-cR)));
